@@ -86,70 +86,73 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   async function loadChapter(novelId, chapterId) {
-    try {
-      loadingEl.className = 'text-gray-500';
-      errorEl.textContent = '';
-      const { contract } = await initWeb3();
-      const purchased = await contract.methods.hasPurchasedChapter(account, novelId, chapterId).call();
-      purchaseBtn.className = purchased ? 'hidden' : 'bg-blue-500 text-white px-4 py-2 rounded mt-4';
+  try {
+    loadingEl.className = 'text-gray-500';
+    errorEl.textContent = '';
+    const { web3, contract } = await initWeb3();
+    const purchased = await contract.methods.hasPurchasedChapter(account, novelId, chapterId).call();
+    console.log('Has Purchased:', purchased); // 调试购买状态
+    purchaseBtn.className = purchased ? 'hidden' : 'bg-blue-500 text-white px-4 py-2 rounded mt-4';
 
-      if (purchased) {
-        const content = await contract.methods.getChapterContent(novelId, chapterId).call();
-        chapterContentEl.innerHTML = '';
-        if (content.startsWith('data:application/pdf;base64,')) {
-          const iframe = document.createElement('iframe');
-          iframe.src = content;
-          iframe.width = '100%';
-          iframe.height = '600px';
-          iframe.title = `Chapter ${chapterId}`;
-          iframe.className = 'border';
-          chapterContentEl.appendChild(iframe);
-        } else {
-          const p = document.createElement('p');
-          p.className = 'whitespace-pre-wrap';
-          p.textContent = content;
-          chapterContentEl.appendChild(p);
-        }
+    if (purchased) {
+      const content = await contract.methods.getChapterContent(novelId, chapterId).call();
+      console.log('Chapter Content:', content); // 调试内容
+      chapterContentEl.innerHTML = '';
+      if (content.startsWith('data:application/pdf;base64,')) {
+        const iframe = document.createElement('iframe');
+        iframe.src = content;
+        iframe.width = '100%';
+        iframe.height = '600px';
+        iframe.title = `Chapter ${chapterId}`;
+        iframe.className = 'border';
+        chapterContentEl.appendChild(iframe);
+      } else if (content) {
+        const p = document.createElement('p');
+        p.className = 'whitespace-pre-wrap';
+        p.textContent = content;
+        chapterContentEl.appendChild(p);
       } else {
-        chapterContentEl.innerHTML = '<p class="text-gray-500">Purchase this chapter to view content.</p>';
+        chapterContentEl.innerHTML = '<p class="text-gray-500">Chapter content is empty.</p>';
       }
-    } catch (err) {
-      errorEl.textContent = `Error loading chapter: ${err.message}`;
-    } finally {
-      loadingEl.className = 'hidden';
+    } else {
+      chapterContentEl.innerHTML = '<p class="text-gray-500">Purchase this chapter to view content.</p>';
     }
+  } catch (err) {
+    console.error('Load Chapter Error:', err); // 详细错误日志
+    errorEl.textContent = `Error loading chapter: ${err.message}`;
+  } finally {
+    loadingEl.className = 'hidden';
   }
+}
 
-  connectWalletBtn.addEventListener('click', connectWallet);
-
-  purchaseBtn.addEventListener('click', async () => {
-    try {
-      loadingEl.className = 'text-gray-500';
-      errorEl.textContent = '';
-      const { web3, contract } = await initWeb3();
-      if (!account) throw new Error('Please connect MetaMask');
-      const valueInWei = web3.utils.toWei(chapterPriceInBNB.toString(), 'ether');
-      console.log('Paying:', chapterPriceInBNB, 'BNB', valueInWei, 'Wei');
-      const tx = await contract.methods.purchaseChapter(id, selectedChapter).send({
-        from: account,
-        value: valueInWei,
-      });
-      console.log('Transaction Receipt:', tx);
+purchaseBtn.addEventListener('click', async () => {
+  try {
+    loadingEl.className = 'text-gray-500';
+    errorEl.textContent = '';
+    const { web3, contract } = await initWeb3();
+    if (!account) throw new Error('Please connect MetaMask');
+    const valueInWei = web3.utils.toWei(chapterPriceInBNB.toString(), 'ether');
+    console.log('Paying:', chapterPriceInBNB, 'BNB', valueInWei, 'Wei');
+    const tx = await contract.methods.purchaseChapter(id, selectedChapter).send({
+      from: account,
+      value: valueInWei,
+    });
+    console.log('Transaction Receipt:', tx);
+    
+    // 等待交易确认
+    await web3.eth.getTransactionReceipt(tx.transactionHash, async (err, receipt) => {
+      if (err || !receipt) {
+        throw new Error('Transaction not confirmed');
+      }
+      console.log('Transaction Confirmed:', receipt);
       purchaseBtn.className = 'hidden';
       await loadChapter(id, selectedChapter);
       await renderChapters(Number(chapterCountEl.textContent.split(' ')[1]));
-    } catch (err) {
-      console.error('Purchase Error:', err);
-      errorEl.textContent = `Purchase failed: ${err.message}`;
-    } finally {
-      loadingEl.className = 'hidden';
-    }
-  });
-
-  if (id && window.ethereum) {
-    await connectWallet();
-  } else {
-    connectWalletBtn.className = 'bg-purple-500 text-white px-4 py-2 rounded mb-4';
+    });
+  } catch (err) {
+    console.error('Purchase Error:', err);
+    errorEl.textContent = `Purchase failed: ${err.message}`;
+  } finally {
     loadingEl.className = 'hidden';
   }
 });
