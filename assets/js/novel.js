@@ -1,6 +1,7 @@
 import { initWeb3 } from './web3-config.js';
+import { Buffer } from 'buffer';
 
-const USDT_TO_BNB = 0.0018; // 1 USDT ≈ 0.0018 BNB (2025/04/29 估算)
+const USDT_TO_BNB = 0.0018; // 1 USDT ≈ 0.0018 BNB (2025/04/29)
 
 document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -108,24 +109,33 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (purchased) {
         let content = '';
         try {
-          const chapter = await contract.methods.chapters(novelId, chapterId).call();
-          const chunkCount = Number(chapter.chunkCount);
+          const chunkCount = Number(await contract.methods.getChunkCount(novelId, chapterId).call());
           console.log('Chunk Count:', chunkCount);
           if (chunkCount === 0) throw new Error('No chunks found for chapter');
 
           for (let i = 0; i < chunkCount; i++) {
-            try {
-              const chunk = await contract.methods.getChapterChunk(novelId, chapterId, i).call();
-              const chunkString = Buffer.from(chunk).toString();
-              console.log(`Chunk ${i} Length:`, chunkString.length);
-              content += chunkString;
-            } catch (chunkErr) {
-              console.error(`Failed to load chunk ${i}:`, chunkErr);
-              throw new Error(`Failed to load chunk ${i}: ${chunkErr.message}`);
+            let chunk;
+            let attempts = 3;
+            while (attempts > 0) {
+              try {
+                chunk = await contract.methods.getChapterChunk(novelId, chapterId, i).call();
+                break;
+              } catch (chunkErr) {
+                console.error(`Attempt ${4 - attempts} failed for chunk ${i}:`, chunkErr);
+                attempts--;
+                if (attempts === 0) {
+                  throw new Error(`Failed to load chunk ${i} after 3 attempts: ${chunkErr.message}`);
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1s before retry
+              }
             }
+            const chunkString = Buffer.from(chunk).toString();
+            console.log(`Chunk ${i} Length:`, chunkString.length);
+            console.log(`Chunk ${i} Content:`, chunkString.slice(0, 50)); // Log first 50 chars
+            content += chunkString;
           }
-          console.log('Chapter Content:', content);
-          console.log('Content Length:', content.length);
+          console.log('Chapter Content Length:', content.length);
+          console.log('Chapter Content Preview:', content.slice(0, 100));
         } catch (contentErr) {
           console.error('Get Chapter Content Error:', contentErr);
           throw new Error(`Failed to load chapter content: ${contentErr.message}`);
@@ -136,7 +146,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (content.startsWith('data:application/pdf;base64,')) {
           try {
             const base64Data = content.split(',')[1];
-            atob(base64Data); // Validate base64
+            atob(base64Data);
             const iframe = document.createElement('iframe');
             iframe.src = content;
             iframe.width = '100%';
@@ -176,6 +186,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const tx = await contract.methods.purchaseChapter(Number(id), selectedChapter).send({
         from: account,
         value: valueInWei,
+        gas: 300000
       });
       console.log('Transaction Receipt:', tx);
 
