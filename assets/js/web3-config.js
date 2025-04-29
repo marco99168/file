@@ -308,6 +308,35 @@ const contractABI = [
 				"internalType": "uint256",
 				"name": "_chapterId",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chunkIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "getChapterChunk",
+		"outputs": [
+			{
+				"internalType": "bytes",
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_novelId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chapterId",
+				"type": "uint256"
 			}
 		],
 		"name": "getChapterContent",
@@ -519,7 +548,7 @@ const contractABI = [
 		"type": "function"
 	}
 ];
-const contractAddress = '0x27D4b8Ea2264Fc115Be0B00538A51B53F16bA7Ed';
+const contractAddress = '0xBFE776C8dcde755344fBb54f808e2a8CDa25dE5A';
 const bscRpcUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
 
 async function initWeb3() {
