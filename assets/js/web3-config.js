@@ -519,7 +519,7 @@ const contractABI = [
 		"type": "function"
 	}
 ];
-const contractAddress = '0x6E7351D495b82d6678F60B492347049ECa5e89Be';
+const contractAddress = '0x27D4b8Ea2264Fc115Be0B00538A51B53F16bA7Ed';
 const bscRpcUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
 
 async function initWeb3() {
