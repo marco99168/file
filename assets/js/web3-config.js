@@ -1,5 +1,5 @@
 const contractABI = [/* 替换为合约ABI，从Remix复制 */];
-const contractAddress = '0xYourDeployedContractAddress'; // 替换为你的合约地址
+const contractAddress = '0xYourDeployedContractAddress';
 const bscRpcUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
 
 async function initWeb3() {
