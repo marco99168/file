@@ -1,49 +1,32 @@
-/* 全局样式，增强 Tailwind CSS */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f4f9;
   color: #333;
 }
-
-/* 容器样式 */
 .container {
   max-width: 1200px;
 }
-
-/* 小说卡片 */
 .border {
   border-color: #e5e7eb;
 }
-
-/* 章节导航按钮 */
 button.rounded {
   transition: background-color 0.2s, color 0.2s;
 }
-
-/* PDF iframe */
 iframe.border {
   border: 1px solid #e5e7eb;
   border-radius: 4px;
 }
-
-/* 文本区域 */
 textarea {
   resize: vertical;
   min-height: 100px;
 }
-
-/* 错误提示 */
 .text-red-500 {
   font-size: 0.875rem;
   margin-top: 0.5rem;
 }
-
-/* 加载提示 */
 .text-gray-500 {
   font-size: 1rem;
 }
-
-/* 响应式调整 */
 @media (max-width: 768px) {
   .grid-cols-3 {
     grid-template-columns: 1fr;
