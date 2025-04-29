@@ -1,23 +1,5 @@
 const contractABI = [
 	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_novelId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "string",
-				"name": "_content",
-				"type": "string"
-			}
-		],
-		"name": "addChapter",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -141,55 +123,6 @@ const contractABI = [
 		"type": "event"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_title",
-				"type": "string"
-			}
-		],
-		"name": "publishNovel",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_novelId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_chapterId",
-				"type": "uint256"
-			}
-		],
-		"name": "purchaseChapter",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_user",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_maxPrice",
-				"type": "uint256"
-			}
-		],
-		"name": "setUserMaxPrice",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -210,7 +143,44 @@ const contractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "withdraw",
+		"name": "DEFAULT_CHAPTER_PRICE",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PLATFORM_FEE_BASIS_POINTS",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_novelId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_content",
+				"type": "string"
+			}
+		],
+		"name": "addChapter",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -244,19 +214,6 @@ const contractABI = [
 				"internalType": "string",
 				"name": "content",
 				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "DEFAULT_CHAPTER_PRICE",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -439,16 +396,52 @@ const contractABI = [
 		"type": "function"
 	},
 	{
-		"inputs": [],
-		"name": "PLATFORM_FEE_BASIS_POINTS",
-		"outputs": [
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_title",
+				"type": "string"
+			}
+		],
+		"name": "publishNovel",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "",
+				"name": "_novelId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chapterId",
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
+		"name": "purchaseChapter",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_maxPrice",
+				"type": "uint256"
+			}
+		],
+		"name": "setUserMaxPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -469,9 +462,16 @@ const contractABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
 	}
 ];
-const contractAddress = '0x1FD63717B67E36B86dcDDa4009d0500562C7f736';
+const contractAddress = '0x50A63e1CDE571e8d3FF5118A959CFc2f6bf98C34';
 const bscRpcUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
 
 async function initWeb3() {
