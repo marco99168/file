@@ -1,6 +1,6 @@
 import { initWeb3 } from './web3-config.js';
 
-const USDT_TO_BNB = 0.0018; // 1 USDT ≈ 0.0018 BNB（2025/04/29 估算）
+const USDT_TO_BNB = 0.0018; // 1 USDT ≈ 0.0018 BNB (2025/04/29 估算)
 
 document.addEventListener('DOMContentLoaded', async () => {
   const urlParams = new URLSearchParams(window.location.search);
@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const connectWalletBtn = document.getElementById('connect-wallet');
   const contentEl = document.getElementById('content');
   const purchaseBtn = document.getElementById('purchase-chapter');
-  const chaptersEl = document.getElementById('chapters');
   const chapterNav = document.getElementById('chapter-nav');
   const chapterContentEl = document.getElementById('chapter-content');
   const errorEl = document.getElementById('error');
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       account = accounts[0];
       connectWalletBtn.className = 'hidden';
       contentEl.className = '';
-      loadNovel();
+      await loadNovel();
     } catch (err) {
       errorEl.textContent = `Error: ${err.message}`;
       connectWalletBtn.className = 'bg-purple-500 text-white px-4 py-2 rounded mb-4';
@@ -45,19 +44,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { web3, contract } = await initWeb3();
       if (!account) throw new Error('Please connect MetaMask');
 
-      const novel = await contract.methods.getNovelInfo(id).call();
+      const novelId = id;
+      const novel = await contract.methods.getNovelInfo(novelId).call();
+      if (!novel[3]) throw new Error('Novel not published');
       titleEl.textContent = novel[2];
       authorEl.textContent = `Author: ${novel[1]}`;
       chapterCountEl.textContent = `Chapters: ${novel[4]}`;
       const chapterCount = Number(novel[4]);
 
       const priceInWei = await contract.methods.getChapterPrice(account).call();
-      const priceInUSDT = web3.utils.fromWei(priceInWei, 'ether');
-      chapterPriceInBNB = priceInUSDT * USDT_TO_BNB;
-      chapterPriceEl.textContent = `Price per Chapter: ${priceInUSDT} USDT (${chapterPriceInBNB.toFixed(6)} BNB)`;
+      console.log('Price in Wei:', priceInWei);
+      chapterPriceInBNB = Number(web3.utils.fromWei(priceInWei, 'ether')).toFixed(18); // 转换为字符串，避免科学记数法
+      console.log('Price in BNB:', chapterPriceInBNB);
+      const priceInUSDT = Number(chapterPriceInBNB) / USDT_TO_BNB;
+      chapterPriceEl.textContent = `Price per Chapter: ${priceInUSDT.toFixed(2)} USDT (${chapterPriceInBNB} BNB)`;
 
-      renderChapters(chapterCount);
-      loadChapter(id, selectedChapter);
+      await renderChapters(chapterCount);
+      await loadChapter(novelId, selectedChapter);
     } catch (err) {
       errorEl.textContent = `Error: ${err.message}`;
     } finally {
@@ -125,14 +128,18 @@ document.addEventListener('DOMContentLoaded', async () => {
       errorEl.textContent = '';
       const { web3, contract } = await initWeb3();
       if (!account) throw new Error('Please connect MetaMask');
-      await contract.methods.purchaseChapter(id, selectedChapter).send({
+      const valueInWei = web3.utils.toWei(chapterPriceInBNB.toString(), 'ether');
+      console.log('Paying:', chapterPriceInBNB, 'BNB', valueInWei, 'Wei');
+      const tx = await contract.methods.purchaseChapter(id, selectedChapter).send({
         from: account,
-        value: web3.utils.toWei(chapterPriceInBNB.toString(), 'ether'),
+        value: valueInWei,
       });
+      console.log('Transaction Receipt:', tx);
       purchaseBtn.className = 'hidden';
-      loadChapter(id, selectedChapter);
-      renderChapters(Number(chapterCountEl.textContent.split(' ')[1]));
+      await loadChapter(id, selectedChapter);
+      await renderChapters(Number(chapterCountEl.textContent.split(' ')[1]));
     } catch (err) {
+      console.error('Purchase Error:', err);
       errorEl.textContent = `Purchase failed: ${err.message}`;
     } finally {
       loadingEl.className = 'hidden';
@@ -140,7 +147,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   if (id && window.ethereum) {
-    connectWallet();
+    await connectWallet();
   } else {
     connectWalletBtn.className = 'bg-purple-500 text-white px-4 py-2 rounded mb-4';
     loadingEl.className = 'hidden';
