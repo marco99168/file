@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       connectWalletBtn.className = 'bg-purple-500 text-white px-4 py-2 rounded mb-4';
       contentEl.className = 'hidden';
     } finally {
-      loadingEl.className = 'hidden'; // 确保隐藏 Loading...
+      loadingEl.className = 'hidden';
     }
   }
 
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { web3, contract } = await initWeb3();
       if (!account) throw new Error('Please connect MetaMask');
 
-      const novelId = Number(id); // 确保是数字
+      const novelId = Number(id);
       if (isNaN(novelId) || novelId <= 0) throw new Error('Invalid novel ID');
 
       const novel = await contract.methods.getNovelInfo(novelId).call();
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       chapterNav.innerHTML = '';
       const { contract } = await initWeb3();
       for (let i = 1; i <= chapterCount; i++) {
-        const purchased = await contract.methods.hasPurchasedChapter(account, id, i).call();
+        const purchased = await contract.methods.hasPurchasedChapter(account, Number(id), i).call();
         const btn = document.createElement('button');
         btn.className = `px-4 py-2 ${i === selectedChapter ? 'bg-blue-500 text-white' : 'bg-gray-200'} rounded`;
         btn.textContent = `Chapter ${i} ${purchased ? '(Purchased)' : ''}`;
@@ -110,26 +110,34 @@ document.addEventListener('DOMContentLoaded', async () => {
         try {
           content = await contract.methods.getChapterContent(novelId, chapterId).call();
           console.log('Chapter Content:', content);
+          console.log('Content Length:', content.length);
         } catch (contentErr) {
           console.error('Get Chapter Content Error:', contentErr);
           throw new Error(`Failed to load chapter content: ${contentErr.message}`);
         }
         chapterContentEl.innerHTML = '';
-        if (content.startsWith('data:application/pdf;base64,')) {
-          const iframe = document.createElement('iframe');
-          iframe.src = content;
-          iframe.width = '100%';
-          iframe.height = '600px';
-          iframe.title = `Chapter ${chapterId}`;
-          iframe.className = 'border';
-          chapterContentEl.appendChild(iframe);
-        } else if (content) {
+        if (!content) {
+          chapterContentEl.innerHTML = '<p class="text-gray-500">Chapter content is empty.</p>';
+        } else if (content.startsWith('data:application/pdf;base64,')) {
+          try {
+            const base64Data = content.split(',')[1];
+            atob(base64Data); // Validate base64
+            const iframe = document.createElement('iframe');
+            iframe.src = content;
+            iframe.width = '100%';
+            iframe.height = '600px';
+            iframe.title = `Chapter ${chapterId}`;
+            iframe.className = 'border';
+            chapterContentEl.appendChild(iframe);
+          } catch (base64Err) {
+            console.error('Base64 Decode Error:', base64Err);
+            chapterContentEl.innerHTML = '<p class="text-gray-500">Invalid PDF content.</p>';
+          }
+        } else {
           const p = document.createElement('p');
           p.className = 'whitespace-pre-wrap';
           p.textContent = content;
           chapterContentEl.appendChild(p);
-        } else {
-          chapterContentEl.innerHTML = '<p class="text-gray-500">Chapter content is empty.</p>';
         }
       } else {
         chapterContentEl.innerHTML = '<p class="text-gray-500">Purchase this chapter to view content.</p>';
@@ -156,7 +164,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       console.log('Transaction Receipt:', tx);
 
-      // 等待交易确认
       const receipt = await waitForConfirmation(web3, tx.transactionHash);
       console.log('Transaction Confirmed:', receipt);
       purchaseBtn.className = 'hidden';
@@ -170,7 +177,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 交易确认等待函数
   async function waitForConfirmation(web3, txHash, maxAttempts = 10, interval = 1000) {
     for (let i = 0; i < maxAttempts; i++) {
       const receipt = await web3.eth.getTransactionReceipt(txHash);
