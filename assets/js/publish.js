@@ -23,18 +23,15 @@ document.addEventListener('DOMContentLoaded', () => {
     errorEl.textContent = '';
     try {
       const title = document.getElementById('title').value;
-      const price = document.getElementById('price').value;
-      if (!title || !price) throw new Error('Title and price are required');
+      if (!title) throw new Error('Title is required');
 
       const { web3, contract } = await initWeb3();
       const accounts = await web3.eth.getAccounts();
       if (!accounts[0]) throw new Error('Please connect MetaMask');
 
-      // 发布小说
-      await contract.methods.publishNovel(title, web3.utils.toWei(price, 'ether')).send({ from: accounts[0] });
+      await contract.methods.publishNovel(title).send({ from: accounts[0] });
       const novelId = await contract.methods.novelCount().call();
 
-      // 上传章节
       const chapterEls = document.querySelectorAll('.chapter');
       for (let i = 0; i < chapterEls.length; i++) {
         const fileInput = chapterEls[i].querySelector('input[type="file"]');
