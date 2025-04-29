@@ -1,5 +1,23 @@
 const contractABI = [
 	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_novelId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "_content",
+				"type": "string"
+			}
+		],
+		"name": "addChapter",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -24,6 +42,12 @@ const contractABI = [
 				"internalType": "address",
 				"name": "author",
 				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "chunkCount",
+				"type": "uint256"
 			}
 		],
 		"name": "ChapterAdded",
@@ -123,6 +147,55 @@ const contractABI = [
 		"type": "event"
 	},
 	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_title",
+				"type": "string"
+			}
+		],
+		"name": "publishNovel",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_novelId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chapterId",
+				"type": "uint256"
+			}
+		],
+		"name": "purchaseChapter",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_user",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_maxPrice",
+				"type": "uint256"
+			}
+		],
+		"name": "setUserMaxPrice",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -143,46 +216,38 @@ const contractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "DEFAULT_CHAPTER_PRICE",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "PLATFORM_FEE_BASIS_POINTS",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
+		"name": "withdraw",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [
 			{
 				"internalType": "uint256",
-				"name": "_novelId",
+				"name": "",
 				"type": "uint256"
 			},
 			{
-				"internalType": "string",
-				"name": "_content",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
-		"name": "addChapter",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"name": "chapterChunks",
+		"outputs": [
+			{
+				"internalType": "bytes",
+				"name": "",
+				"type": "bytes"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -211,9 +276,22 @@ const contractABI = [
 				"type": "uint256"
 			},
 			{
-				"internalType": "string",
-				"name": "content",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "chunkCount",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "DEFAULT_CHAPTER_PRICE",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"stateMutability": "view",
@@ -332,6 +410,19 @@ const contractABI = [
 	},
 	{
 		"inputs": [],
+		"name": "MAX_CHUNK_SIZE",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
 		"name": "novelCount",
 		"outputs": [
 			{
@@ -396,52 +487,16 @@ const contractABI = [
 		"type": "function"
 	},
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_title",
-				"type": "string"
-			}
-		],
-		"name": "publishNovel",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
+		"inputs": [],
+		"name": "PLATFORM_FEE_BASIS_POINTS",
+		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "_novelId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_chapterId",
+				"name": "",
 				"type": "uint256"
 			}
 		],
-		"name": "purchaseChapter",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_user",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_maxPrice",
-				"type": "uint256"
-			}
-		],
-		"name": "setUserMaxPrice",
-		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -462,16 +517,9 @@ const contractABI = [
 		],
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "withdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	}
 ];
-const contractAddress = '0x50A63e1CDE571e8d3FF5118A959CFc2f6bf98C34';
+const contractAddress = '0x0CB2394D77C6EA28702b86D9DCacf6cA999c5B56';
 const bscRpcUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
 
 async function initWeb3() {
