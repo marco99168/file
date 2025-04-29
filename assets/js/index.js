@@ -14,7 +14,7 @@ async function loadNovels() {
       div.innerHTML = `
         <h2 class="text-xl font-semibold">${novel[2]}</h2>
         <p>Author: ${novel[1]}</p>
-        <p>Price: ${Web3.utils.fromWei(novel[3], 'ether')} BNB</p>
+        <p>Chapters: ${novel[4]}</p>
         <a href="/novel.html?id=${novel[0]}" class="text-blue-500">View Details</a>
       `;
       novelList.appendChild(div);
