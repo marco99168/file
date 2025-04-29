@@ -1,4 +1,20 @@
-const contractABI = [
+import Web3 from 'web3';
+
+export async function initWeb3() {
+  let web3;
+  if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    try {
+      await window.ethereum.request({ method: 'eth_requestAccounts' });
+    } catch (error) {
+      throw new Error('User denied account access');
+    }
+  } else {
+    web3 = new Web3('https://bsc-testnet-rpc.publicnode.com'); // Switched to PublicNode
+  }
+
+  const contractAddress = '0xaeD8600688129911Ab54f1b0a4153914614821c9';
+  const contractABI = [
 	{
 		"inputs": [
 			{
@@ -375,6 +391,59 @@ const contractABI = [
 				"internalType": "uint256",
 				"name": "_novelId",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chapterId",
+				"type": "uint256"
+			}
+		],
+		"name": "getChunkCount",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_novelId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chapterId",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_chunkIndex",
+				"type": "uint256"
+			}
+		],
+		"name": "getChunkLength",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_novelId",
+				"type": "uint256"
 			}
 		],
 		"name": "getNovelInfo",
@@ -548,23 +617,7 @@ const contractABI = [
 		"type": "function"
 	}
 ];
-const contractAddress = '0xBFE776C8dcde755344fBb54f808e2a8CDa25dE5A';
-const bscRpcUrl = 'https://data-seed-prebsc-1-s1.binance.org:8545/';
-
-async function initWeb3() {
-  let web3;
-  if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
-    try {
-      await window.ethereum.request({ method: 'eth_requestAccounts' });
-    } catch (error) {
-      throw new Error('User denied account access');
-    }
-  } else {
-    web3 = new Web3(bscRpcUrl);
-  }
   const contract = new web3.eth.Contract(contractABI, contractAddress);
+
   return { web3, contract };
 }
-
-export { initWeb3 };
