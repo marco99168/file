@@ -106,9 +106,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       purchaseBtn.className = purchased ? 'hidden' : 'bg-blue-500 text-white px-4 py-2 rounded mt-4';
 
       if (purchased) {
-        let content;
+        let content = '';
         try {
-          content = await contract.methods.getChapterContent(novelId, chapterId).call();
+          const chapter = await contract.methods.chapters(novelId, chapterId).call();
+          const chunkCount = Number(chapter.chunkCount);
+          console.log('Chunk Count:', chunkCount);
+          if (chunkCount === 0) throw new Error('No chunks found for chapter');
+
+          for (let i = 0; i < chunkCount; i++) {
+            try {
+              const chunk = await contract.methods.getChapterChunk(novelId, chapterId, i).call();
+              const chunkString = Buffer.from(chunk).toString();
+              console.log(`Chunk ${i} Length:`, chunkString.length);
+              content += chunkString;
+            } catch (chunkErr) {
+              console.error(`Failed to load chunk ${i}:`, chunkErr);
+              throw new Error(`Failed to load chunk ${i}: ${chunkErr.message}`);
+            }
+          }
           console.log('Chapter Content:', content);
           console.log('Content Length:', content.length);
         } catch (contentErr) {
