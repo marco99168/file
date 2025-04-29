@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Novel Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container mx-auto p-4">
+    <h1 id="title" class="text-3xl font-bold"></h1>
+    <p id="author"></p>
+    <p id="price"></p>
+    <p id="chapter-count"></p>
+    <div id="content">
+      <button id="purchase" class="bg-blue-500 text-white px-4 py-2 rounded hidden">Purchase</button>
+      <div id="chapters" class="hidden">
+        <h2>Chapters:</h2>
+        <div id="chapter-nav" class="flex space-x-2 mb-4 overflow-x-auto"></div>
+        <div id="chapter-content"></div>
+      </div>
+    </div>
+    <p id="error" class="text-red-500"></p>
+    <p id="loading" class="text-gray-500">Loading...</p>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/web3@4.0.3/dist/web3.min.js"></script>
+  <script type="module" src="/assets/js/novel.js"></script>
+</body>
+</html>
